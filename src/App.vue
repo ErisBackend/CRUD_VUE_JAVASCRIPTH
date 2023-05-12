@@ -3,7 +3,7 @@
   <div class="container">
     <h1>Data Kariawan</h1>
     <span class="me-2">+ Tambah Karyawan</span> 
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add</button>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @click="() => this.Judul = 'Tambah Karyawan'">Add</button>
     <!-- data-bs-toggle="modal" data-bs-target="#exampleModal" dari bootstrap perintah untuk membuta pop up modal -->
     <br>
     <table class="table">
@@ -28,7 +28,7 @@
       <td>{{ orang.last_name }}</td>
       <td>{{ orang.email }}</td>
       <td>
-        <button  class="btn btn-primary me-2">ubah</button>
+        <button  class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#exampleModal" @click="() => ubahKaryawan(orang.id, orang.first_name , orang.last_name, orang.email)">ubah</button>
         <button class="btn btn-danger" @click="() => hapus(orang.id)">pecat</button>
       </td>
     </tr>
@@ -42,7 +42,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Tambah karyawan</h5>
+        <h5 class="modal-title" id="exampleModalLabel">{{ Judul }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -53,32 +53,19 @@
             <!-- <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div> -->
           </div>
           <div class="mb-3">
-            <label for="nama_depan" class="form-label">Nama Depan</label>
-            <input type="text" class="form-control" id="nama_depan" required>
+            <label for="nama_depan" class="form-label">Nama</label>
+            <input type="text" class="form-control" id="nama_depan" :value="Fname" required>
             <!-- <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div> -->
           </div>
          
           <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" required>
+            <input type="email" class="form-control" id="email" :value="Femail" required>
             <!-- <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div> -->
           </div>
-  
-  <!-- <div class="mb-3">
-    <label for="exampleInputPassword1" class="form-label">Password</label>
-    <input type="password" class="form-control" id="exampleInputPassword1">
-  </div> -->
-  <!-- <div class="mb-3 form-check">
-    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-    <label class="form-check-label" for="exampleCheck1">Check me out</label>
-  </div> -->
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
       </div>
-      <!-- <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div> -->
     </div>
   </div>
 </div>
@@ -107,6 +94,33 @@
     </div>
   </div>
 </div>
+
+
+<div class="modal fade" id="" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="card" style="width: 18rem;">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item"><img :src="davatar" alt="orang"></li>
+                <li class="list-group-item">{{ dname }}</li>
+                <li class="list-group-item">{{ demail }}</li>
+              </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+ 
 </template>
 
 <script>
@@ -121,10 +135,13 @@ export default {
           karyawan : [],
           name:'',
           email:'',
+          Fname:'',
+          Femail:'',
           avatar: null,
           dname: '',//dibuat berdasarkan this name yg ada pada get sebagai penampung
           demail: '',
           davatar: '',
+          Judul: ''
         }
       },
 
@@ -155,12 +172,37 @@ export default {
                 'Content-Type': "multipart/form-data"
               }
             })
-          .then(res => console.log("berhasil",res))
+          .then(res => {
+            console.log("berhasil",res)
+             this.Fname = ''
+             this.Femail = ''
+             this.name = ''
+             this.email =''
+             document.querySelectorAll('input').forEach(e => {
+              e.value = ''
+             })
+
+          })
           .catch(err => console.error("gagal",err))
         },
         hapus(bebas){
           axios.delete('https://reqres.in/api/users/'+bebas)
           .then(res => (console.log('berhasil'),console.log(res)))
+          
+        },
+
+        ubahKaryawan(bebas, ...data){
+          this.Judul = 'Ubah Karyawan'
+
+          this.Fname = data[0]+' '+data[1]
+          this.Femail = data[2]
+
+          // axios.put('https://reqres.in/api/users/'+bebas, {
+          //   name: this.name,
+          //   email: this.emai
+          // })
+          // .then(res => (console.log('berhasil'),console.log(res)))
+          // .catch(err => (console.log('gagal'),console.log(err)))
         },
         ViewKaryawan(bebas){
                           axios.get('https://reqres.in/api/users/'+bebas)
@@ -170,7 +212,8 @@ export default {
                                           this.demail = res.data.data.email
                                         })
                             }
-      }
+      },
+
 }
 </script>
 
